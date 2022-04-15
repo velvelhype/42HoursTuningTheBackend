@@ -32,7 +32,7 @@ const mylog = (obj) => {
 const getLinkedUser = async (headers) => {
   const target = headers['x-app-key'];
   mylog(target);
-  const qs = `select * from session where value = ? limit 1`;
+  const qs = `select linked_user_id from session where value = ? limit 1`;
 
   const [rows] = await pool.query(qs, [`${target}`]);
 
