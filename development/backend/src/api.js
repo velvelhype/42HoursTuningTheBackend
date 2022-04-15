@@ -928,7 +928,7 @@ const getRecordItemFile = async (req, res) => {
     and
     r.item_id = ?
     and
-    r.linked_file_id = f.file_id`,
+    r.linked_file_id = f.file_id limit 1`,
     [`${recordId}`, `${itemId}`],
   );
 
