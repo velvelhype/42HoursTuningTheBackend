@@ -108,6 +108,7 @@ const postRecords = async (req, res) => {
 // GET /records/{recordId}
 // 文書詳細取得
 const getRecord = async (req, res) => {
+  console.log("\n\n\n\n\n\n\n\n\n\nget record run!!\n\n\n\n\n\n\n\n\n");
   let user = await getLinkedUser(req.headers);
 
   if (!user) {
@@ -218,6 +219,7 @@ const getRecord = async (req, res) => {
 // GET /record-views/tomeActive
 // 自分宛一覧
 const tomeActive = async (req, res) => {
+  console.log("tomeActive run!!!\n");
   let user = await getLinkedUser(req.headers);
 
   if (!user) {
