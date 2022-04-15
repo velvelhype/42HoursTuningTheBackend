@@ -970,7 +970,7 @@ const getRecordItemFileThumbnail = async (req, res) => {
     and
     r.item_id = ?
     and
-    r.linked_thumbnail_file_id = f.file_id`,
+    r.linked_thumbnail_file_id = f.file_id limit 1`,
     [`${recordId}`, `${itemId}`],
   );
 
