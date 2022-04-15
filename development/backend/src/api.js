@@ -32,7 +32,8 @@ const mylog = (obj) => {
 const getLinkedUser = async (headers) => {
   const target = headers['x-app-key'];
   mylog(target);
-  const qs = `select * from session where value = ?`;
+  const qs = `select linked_user_id from session where value = ? limit 1`;
+  // const qs = `select * from session where value = ?`
 
   const [rows] = await pool.query(qs, [`${target}`]);
 
@@ -108,7 +109,6 @@ const postRecords = async (req, res) => {
 // GET /records/{recordId}
 // 文書詳細取得
 const getRecord = async (req, res) => {
-  console.log("\n\n\n\n\n\n\n\n\n\nget record run!!\n\n\n\n\n\n\n\n\n");
   let user = await getLinkedUser(req.headers);
 
   if (!user) {
@@ -190,7 +190,7 @@ const getRecord = async (req, res) => {
   mylog('itemResult');
   mylog(itemResult);
 
-  const searchFileQs = `select * from file where file_id = ?`;
+  const searchFileQs = `select name from file where file_id = ? limit 1`;
   for (let i = 0; i < itemResult.length; i++) {
     const item = itemResult[i];
     const [fileResult] = await pool.query(searchFileQs, [item.linked_file_id]);
@@ -219,9 +219,10 @@ const getRecord = async (req, res) => {
 // GET /record-views/tomeActive
 // 自分宛一覧
 const tomeActive = async (req, res) => {
-  console.log("tomeActive run!!!\n");
+  let start = new Date();
   let user = await getLinkedUser(req.headers);
 
+  console.log("tome active run: %dms\n", start);
   if (!user) {
     res.status(401).send();
     return;
