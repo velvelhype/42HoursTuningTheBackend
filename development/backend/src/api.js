@@ -222,7 +222,6 @@ const tomeActive = async (req, res) => {
   let start = new Date();
   let user = await getLinkedUser(req.headers);
 
-  console.log("tome active run: %dms\n", start);
   if (!user) {
     res.status(401).send();
     return;
@@ -236,12 +235,12 @@ const tomeActive = async (req, res) => {
     limit = 10;
   }
 
-  const searchMyGroupQs = `select * from group_member where user_id = ?`;
+  const searchMyGroupQs = `select group_id from group_member where user_id = ?`;
   const [myGroupResult] = await pool.query(searchMyGroupQs, [user.user_id]);
   mylog(myGroupResult);
 
   const targetCategoryAppGroupList = [];
-  const searchTargetQs = `select * from category_group where group_id = ?`;
+  const searchTargetQs = `select category_id, application_group from category_group where group_id = ?`;
 
   for (let i = 0; i < myGroupResult.length; i++) {
     const groupId = myGroupResult[i].group_id;
