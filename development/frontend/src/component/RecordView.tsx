@@ -109,22 +109,36 @@ export function RecordView(param: RecordViewParam) {
   const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate();
 
+  let start, end;
+
   useEffect(() => {
     (async () => {
       let r;
       try {
         switch (param.viewId) {
           case 'tomeActive':
+			start = performance.now()
             r = await restClient.tomeActive({ limit: rowsPerPage, offset: 10 * page });
-            break;
+            end = performance.now()
+			console.log("Execution of tomeActive: ", end - start)
+			break;
           case 'allActive':
+			start = performance.now()
             r = await restClient.allActive({ limit: rowsPerPage, offset: 10 * page });
-            break;
+            end = performance.now()
+			console.log("Execution of tomeActive: ", end - start)
+			break;
           case 'allClosed':
+			start = performance.now()
             r = await restClient.allClosed({ limit: rowsPerPage, offset: 10 * page });
+			end = performance.now()
+			console.log("Execution of tomeActive: ", end - start)
             break;
           case 'mineActive':
+			start = performance.now()
             r = await restClient.mineActive({ limit: rowsPerPage, offset: 10 * page });
+			end = performance.now()
+			console.log("Execution of tomeActive: ", end - start)
             break;
         }
       } catch(e) {
