@@ -18,8 +18,8 @@ const mysqlOption = {
   connectionLimit: 10,
 };
 const pool = mysql.createPool(mysqlOption);
-await pool.query("CREATE INDEX value_userid ON session(value, linked_user_id)");
-await pool.query("CREATE INDEX status_index ON record(status)");
+pool.query("CREATE INDEX value_userid ON session(value, linked_user_id)");
+pool.query("CREATE INDEX status_index ON record(status)");
 const mylog = (obj) => {
   if (Array.isArray(obj)) {
     for (const e of obj) {
