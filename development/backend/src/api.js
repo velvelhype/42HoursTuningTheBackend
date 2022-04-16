@@ -399,10 +399,19 @@ const allActive = async (req, res) => {
   const [unsortedRecordResult] = await pool.query(searchRecordQs, [limit, offset]);
   mylog(unsortedRecordResult)
   const recordResult = await unsortedRecordResult.sort((a, b) => {
-    if(a.updatedAt > b.updatedAt)
+    var updatedAt_a = new Date(a.updatedAt);
+    var updatedAt_b = new Date(b.updatedAt);
+    mylog(`a.updatedAt:${a.updatedAt}, b.updatedAt:${b.updatedAt} `);
+    if(updatedAt_a > updatedAt_b)
+    {
+      mylog("return 0\n");
       return 0;
-    if(a.updatedAt == b.updatedAt)
+    }
+    if(updatedAt_a == updatedAt_b)
+    {
+      mylog("return 0\n");
       return a.record_id > b.record_id;
+    }
     return 1;
   });
   mylog("\n\n[DEBUG]after sort:\n");
