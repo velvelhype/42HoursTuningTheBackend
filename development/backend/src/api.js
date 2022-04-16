@@ -242,7 +242,7 @@ const tomeActive = async (req, res) => {
   const targetCategoryAppGroupList = [];
   const searchTargetQs = `select category_id, application_group from category_group where group_id = ?`;
 
-  for (let i = 0; i < (myGroupResult.length / 2); i++) {
+  for (let i = 0; i < (myGroupResult.length); i++) {
     const groupId = myGroupResult[i].group_id;
     mylog(groupId);
 
