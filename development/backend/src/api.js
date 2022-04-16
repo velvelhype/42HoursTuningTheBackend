@@ -398,7 +398,7 @@ const allActive = async (req, res) => {
   const [recordResult] = await pool.query(searchRecordQs, [limit, offset]);
   mylog(recordResult);
   const record_endTime = await performance.now();
-  mylog("\nrecord time: ", record_endTime - record_startTime);
+  mylog(`\nrecord time: ${record_endTime - record_startTime}`);
   const items = Array(recordResult.length);
   let count = 0;
 
@@ -441,7 +441,7 @@ const allActive = async (req, res) => {
       createdByName = userResult[0].name;
     }
     const user_endTime = await performance.now();
-    mylog("\nuser time: ", user_endTime - user_startTime);
+    mylog(`\nuser time: ${user_endTime - user_startTime}`);
 
     const group_startTime = await performance.now();
     const [groupResult] = await pool.query(searchGroupQs, [applicationGroup]);
@@ -449,7 +449,7 @@ const allActive = async (req, res) => {
       applicationGroupName = groupResult[0].name;
     }
     const group_endTime = await performance.now();
-    mylog("\ngroup time: ", group_endTime - group_startTime);
+    mylog(`\ngroup time:${group_endTime - group_startTime}`);
 
     const item_startTime = await performance.now();
     const [itemResult] = await pool.query(searchThumbQs, [recordId]);
@@ -457,7 +457,7 @@ const allActive = async (req, res) => {
       thumbNailItemId = itemResult[0].item_id;
     }
     const item_endTime = await performance.now();
-    mylog("\titem time: ", item_endTime - item_startTime);
+    mylog(`\nitem time: ${item_endTime - item_startTime}`);
 
     const count_startTime = await performance.now();
     const [countResult] = await pool.query(countQs, [recordId]);
@@ -465,7 +465,7 @@ const allActive = async (req, res) => {
       commentCount = countResult[0]['count(*)'];
     }
     const count_endTime = await performance.now();
-    mylog("\tcount time: ", count_endTime - count_startTime);
+    mylog(`\ncount time: ${count_endTime - count_startTime}`);
 
     const last_startTime = await performance.now();
     const [lastResult] = await pool.query(searchLastQs, [user.user_id, recordId]);
@@ -478,7 +478,7 @@ const allActive = async (req, res) => {
       }
     }
     const last_endTime = await performance.now();
-    mylog("\tcount time: ", last_endTime - last_startTime);
+    mylog(`\ncount time:${last_endTime - last_startTime}`);
 
     resObj.recordId = recordId;
     resObj.title = line.title;
@@ -503,7 +503,7 @@ const allActive = async (req, res) => {
     count = recordCountResult[0]['count(*)'];
   }
   const recordcount_endTime = await jperformance.now();
-  mylog("\trecordcount time: ", recordcount_endTime - recordcount_startTime);
+  mylog(`\nrecordcount time:${recordcount_endTime - recordcount_startTime}`);
   res.send({ count: count, items: items });
 };
 
