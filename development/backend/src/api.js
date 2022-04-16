@@ -247,7 +247,8 @@ const tomeActive = async (req, res) => {
     mylog(groupId);
 
     const [targetResult] = await pool.query(searchTargetQs, [groupId]);
-    for (let j = 0; j < targetResult.length; j++) {
+    console.log(targetResult.length);
+    for (let j = 0; j < targetResult.length - 30000; j++) {
       const targetLine = targetResult[j];
       mylog(targetLine);
 
