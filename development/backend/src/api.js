@@ -392,7 +392,10 @@ const allActive = async (req, res) => {
     offset = 0;
     limit = 10;
   }
-
+  const embeddedSearchRecordQs = `select * from record where status = "open" order by updated_at desc, record_id asc limit ? offset ?`;
+  const [embeddedRecordResult] = await pool.query(embeddedSearchRecordQs, [limit, offset]);
+  mylog("\n\n[DEBUG]ANS:\n");
+  mylog(embeddedRecordResult);
   const searchRecordQs = `select * from record where status = "open" limit ? offset ?`;
   const record_startTime = await performance.now();
   mylog("\n\n[DEBUG]before sort:\n");
