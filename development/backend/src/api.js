@@ -502,7 +502,7 @@ const allActive = async (req, res) => {
   if (recordCountResult.length === 1) {
     count = recordCountResult[0]['count(*)'];
   }
-  const recordcount_endTime = await jperformance.now();
+  const recordcount_endTime = await performance.now();
   mylog(`\nrecordcount time:${recordcount_endTime - recordcount_startTime}`);
   res.send({ count: count, items: items });
 };
