@@ -34,10 +34,6 @@ const getLinkedUser = async (headers) => {
   const target = headers['x-app-key'];
   mylog(target);
   const qs = `select linked_user_id from session where value = ? limit 1`;
-<<<<<<< HEAD
-=======
-  // const qs = `select * from session where value = ?`
->>>>>>> abda28a3f0570526397a542c4f265a45895546c9
 
   const [rows] = await pool.query(qs, [`${target}`]);
 
