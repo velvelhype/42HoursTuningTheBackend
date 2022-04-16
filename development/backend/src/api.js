@@ -530,19 +530,18 @@ const allClosed = async (req, res) => {
 
   const searchRecordQs = `select * from record where status = "closed" order by updated_at desc, record_id asc limit ? offset ?`;
 
-	
   const [recordResult] = await pool.query(searchRecordQs, [limit, offset]);
   mylog(recordResult);
 
   const items = Array(recordResult.length);
   let count = 0;
 
-  const searchUserQs = 'select * from user where user_id = ? limit 2';
-  const searchGroupQs = 'select * from group_info where group_id = ? limit 2';
+  const searchUserQs = 'select * from user where user_id = ?';
+  const searchGroupQs = 'select * from group_info where group_id = ?';
   const searchThumbQs =
     'select * from record_item_file where linked_record_id = ? order by item_id asc limit 1';
   const countQs = 'select count(*) from record_comment where linked_record_id = ?';
-  const searchLastQs = 'select * from record_last_access where user_id = ? and record_id = ? limit 1';
+  const searchLastQs = 'select * from record_last_access where user_id = ? and record_id = ?';
 
   for (let i = 0; i < recordResult.length; i++) {
     const resObj = {
@@ -653,7 +652,7 @@ const mineActive = async (req, res) => {
   let count = 0;
 
   const searchUserQs = 'select * from user where user_id = ?';
-  const searchGroupQs = 'select* from group_info where group_id = ?';
+  const searchGroupQs = 'select * from group_info where group_id = ?';
   const searchThumbQs =
     'select * from record_item_file where linked_record_id = ? order by item_id asc limit 1';
   const countQs = 'select count(*) from record_comment where linked_record_id = ?';
@@ -948,7 +947,7 @@ const getRecordItemFile = async (req, res) => {
     and
     r.item_id = ?
     and
-    r.linked_file_id = f.file_id limit 1`,
+    r.linked_file_id = f.file_id`,
     [`${recordId}`, `${itemId}`],
   );
 
@@ -990,7 +989,7 @@ const getRecordItemFileThumbnail = async (req, res) => {
     and
     r.item_id = ?
     and
-    r.linked_thumbnail_file_id = f.file_id limit 1`,
+    r.linked_thumbnail_file_id = f.file_id`,
     [`${recordId}`, `${itemId}`],
   );
 
