@@ -234,16 +234,16 @@ const tomeActive = async (req, res) => {
   }
 
   const searchMyGroupQs = `select * from group_member where user_id = ?`;
-  /*
+  
   const [myGroupResult] = await pool.query(searchMyGroupQs, [user.user_id]);
   mylog(myGroupResult);
- */
+ 
   const targetCategoryAppGroupList = [];
   const searchTargetQs = `select * from category_group where group_id = ?`;
-
+/*
   const searchMyGroupAndTargetQS = `SELECT category_id, application_group FROM category_group AS a JOIN (SELECT * FROM group_member where user_id = 1) AS b ON a.group_id = b.group_id`;
-                                    
-  /*
+*/                                    
+  
   for (let i = 0; i < myGroupResult.length; i++) {
     const groupId = myGroupResult[i].group_id;
     mylog(groupId);
@@ -259,8 +259,9 @@ const tomeActive = async (req, res) => {
       });
     }
   }
- */
-  const [targetResult] = await pool.query(searchMyGroupAndTargetQS, [user.user_id]);
+  mylog("\n\n\n[DEBUG]", targetCategoryAppGroupList);
+ 
+/*  const [targetResult] = await pool.query(searchMyGroupAndTargetQS, [user.user_id]);
   mylog("\n\n\n\n[DEBUG]\n", targetResult);
   for (let j = 0; j < targetResult.length; j++) {
     const targetLine = targetResult[j];
@@ -270,6 +271,7 @@ const tomeActive = async (req, res) => {
       applicationGroup: targetLine.application_group,
     });
   }
+ */
   let searchRecordQs =
     'select * from record where status = "open" and (category_id, application_group) in (';
   let recordCountQs =
