@@ -297,8 +297,9 @@ const tomeActive = async (req, res) => {
   const [recordResult] = await pool.query(searchRecordQs, param);
   mylog(recordResult);
  
-
+/*
   const [recordResult] = await pool.query(searchRecordwithJoinQs, [user.user_id, limit, offcet])
+*/ 
   const items = Array(recordResult.length);
   let count = recordResult.length;
 
@@ -524,6 +525,7 @@ const allClosed = async (req, res) => {
 
   const searchRecordQs = `select * from record where status = "closed" order by updated_at desc, record_id asc limit ? offset ?`;
 
+	
   const [recordResult] = await pool.query(searchRecordQs, [limit, offset]);
   mylog(recordResult);
 
