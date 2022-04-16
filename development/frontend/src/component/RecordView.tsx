@@ -126,19 +126,19 @@ export function RecordView(param: RecordViewParam) {
 			start = performance.now()
             r = await restClient.allActive({ limit: rowsPerPage, offset: 10 * page });
             end = performance.now()
-			console.log("Execution of tomeActive: ", end - start)
+			console.log("Execution of allActive: ", end - start)
 			break;
           case 'allClosed':
 			start = performance.now()
             r = await restClient.allClosed({ limit: rowsPerPage, offset: 10 * page });
 			end = performance.now()
-			console.log("Execution of tomeActive: ", end - start)
+			console.log("Execution of allClosed: ", end - start)
             break;
           case 'mineActive':
 			start = performance.now()
             r = await restClient.mineActive({ limit: rowsPerPage, offset: 10 * page });
 			end = performance.now()
-			console.log("Execution of tomeActive: ", end - start)
+			console.log("Execution of mineActive: ", end - start)
             break;
         }
       } catch(e) {
