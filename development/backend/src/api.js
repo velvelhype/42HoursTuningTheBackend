@@ -397,7 +397,7 @@ const allActive = async (req, res) => {
   const record_startTime = await performance.now();
   const [recordResult] = await pool.query(searchRecordQs, [limit, offset]);
   mylog(recordResult);
-  const record_endTime = await erformance.now();
+  const record_endTime = await performance.now();
   mylog("\nrecord time: ", record_endTime - record_startTime);
   const items = Array(recordResult.length);
   let count = 0;
