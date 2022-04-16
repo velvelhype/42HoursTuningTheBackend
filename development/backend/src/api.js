@@ -241,7 +241,7 @@ const tomeActive = async (req, res) => {
   const targetCategoryAppGroupList = [];
   const searchTargetQs = `select * from category_group where group_id = ?`;
 
-  const searchMyGroupAndTargetQS = `SELECT category_id, application_group FROM category_group AS a JOIN (SELECT * FROM group_member where user_id = 1) AS b ON a.group_id = b.group_id`
+  const searchMyGroupAndTargetQS = `SELECT category_id, application_group FROM category_group AS a JOIN (SELECT * FROM group_member where user_id = 1) AS b ON a.group_id = b.group_id`;
                                     
   /*
   for (let i = 0; i < myGroupResult.length; i++) {
