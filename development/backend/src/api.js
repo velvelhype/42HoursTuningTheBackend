@@ -392,12 +392,14 @@ const allActive = async (req, res) => {
     offset = 0;
     limit = 10;
   }
-  const embeddedSearchRecordQs = `select * from record where status = "open" order by updated_at desc, record_id asc limit ? offset ?`;
+  const record_startTime = await performance.now();
+  const SearchRecordQs = `select * from record where status = "open" order by updated_at desc, record_id asc limit ? offset ?`;
+  const [recordResult] = await pool.query(searchRecordQs, [limit, offset]);
+  /*
   const [embeddedRecordResult] = await pool.query(embeddedSearchRecordQs, [limit, offset]);
   mylog("\n\n[DEBUG]ANS:\n");
   mylog(embeddedRecordResult);
   const searchRecordQs = `select * from record where status = "open" limit ? offset ?`;
-  const record_startTime = await performance.now();
   mylog("\n\n[DEBUG]before sort:\n");
   const [unsortedRecordResult] = await pool.query(searchRecordQs, [limit, offset]);
   mylog(unsortedRecordResult)
@@ -421,6 +423,7 @@ const allActive = async (req, res) => {
   mylog("\n\n[DEBUG]after sort:\n");
   mylog(recordResult)
   if(DEBUG)(recordResult);
+  */
   const record_endTime = await performance.now();
   mylog(`\nrecord time: ${record_endTime - record_startTime}`);
   const items = Array(recordResult.length);

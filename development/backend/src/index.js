@@ -2,8 +2,20 @@ const express = require('express')
 const app = express();
 
 app.use(express.json({limit: '10mb'}))
-
+const mysql = require('mysql2/promise');
 const api = require("./api");
+
+
+const mysqlOption = {
+  host: 'mysql',
+  user: 'backend',
+  password: 'backend',
+  database: 'app',
+  waitForConnections: true,
+  connectionLimit: 10,
+};
+const pool = mysql.createPool(mysqlOption);
+await pool.query("CREATE INDEX status_val ON record(status)", []);
 
 app.get('/api/hello', (req, res) => {
   console.log('requested');
