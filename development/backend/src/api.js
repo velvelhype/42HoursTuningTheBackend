@@ -404,8 +404,8 @@ const allActive = async (req, res) => {
     mylog(`a.updatedAt:${a.updated_at}, b.updatedAt:${b.updated_at} , compare：${updatedAt_a < updatedAt_b}`);
     if(updatedAt_a > updatedAt_b)
     {
-      mylog("return 0\n");
-      return 0;
+      mylog("return -1\n");
+      return -1;
     }
     if(updatedAt_a == updatedAt_b)
     {
