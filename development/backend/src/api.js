@@ -241,9 +241,7 @@ const tomeActive = async (req, res) => {
   const targetCategoryAppGroupList = [];
   const searchTargetQs = `select * from category_group where group_id = ?`;
 
-  const searchMyGroupAndTargetQS = `SELECT * FROM category_group
-                                    JOIN (SELECT * FROM group_member where user_id = ?)
-				    ON category_group.group_id = group_member.group_id`
+  const searchMyGroupAndTargetQS = `SELECT category_id, application_group FROM category_group AS a JOIN (SELECT * FROM group_member where user_id = 1) AS b ON a.group_id = b.group_id`
                                     
   /*
   for (let i = 0; i < myGroupResult.length; i++) {
@@ -263,6 +261,7 @@ const tomeActive = async (req, res) => {
   }
  */
   const [targetResult] = await pool.query(searchMyGroupAndTargetQS, [user.user_id]);
+  mylog("\n\n\n\n[DEBUG]\n", targetResult);
   for (let j = 0; j < targetResult.length; j++) {
     const targetLine = targetResult[j];
     mylog(targetLine);
