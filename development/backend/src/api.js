@@ -398,7 +398,13 @@ const allActive = async (req, res) => {
   mylog("\n\n[DEBUG]before sort:\n");
   const [recordResult] = await pool.query(searchRecordQs, [limit, offset]);
   mylog(recordResult)
-  recordResult.sort((a, b) => a.updated_at < b.updated_at || a.record_id > b.record_id);
+  recordResult.sort((a, b) => {
+    if(a.updatedAt > b.updatedAt)
+      return 0;
+    if(a.updatedAt == b.updatedAt)
+      return a.record_id > b.record_id;
+    return 1;
+  });
   mylog("\n\n[DEBUG]after sort:\n");
   mylog(recordResult)
   if(DEBUG)(recordResult);
