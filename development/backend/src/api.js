@@ -393,9 +393,14 @@ const allActive = async (req, res) => {
     limit = 10;
   }
 
-  const searchRecordQs = `select * from record where status = "open" order by updated_at desc, record_id asc limit ? offset ?`;
+  const searchRecordQs = `select * from record where status = "open" limit ? offset ?`;
   const record_startTime = await performance.now();
+  mylog("\n\n[DEBUG]before sort:\n");
   const [recordResult] = await pool.query(searchRecordQs, [limit, offset]);
+  mylog(recordResult)
+  recordResult.sort((a, b) => a.updated_at < b.updated_at || a.record_id > b.record_id);
+  mylog("\n\n[DEBUG]after sort:\n");
+  mylog(recordResult)
   if(DEBUG)(recordResult);
   const record_endTime = await performance.now();
   mylog(`\nrecord time: ${record_endTime - record_startTime}`);
