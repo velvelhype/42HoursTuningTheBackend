@@ -234,19 +234,21 @@ const tomeActive = async (req, res) => {
   }
 
   const searchMyGroupQs = `select * from group_member where user_id = ?`;
+  /*
   const [myGroupResult] = await pool.query(searchMyGroupQs, [user.user_id]);
   mylog(myGroupResult);
-
+ */
   const targetCategoryAppGroupList = [];
   const searchTargetQs = `select * from category_group where group_id = ?`;
 
   const searchRecordwithJoinQs = `SELECT * FROM record 
-                                  JOIN (SELECT * FROM category_group WHERE group_id = ?) 
-                                  AN c1 
+                                  JOIN (SELECT * FROM category_group 
+                                    JOIN SELECT * from group_member where user_id = ? 
+                                    ON group_member.group_id = category_group.group_id) AS c1 
                                   ON record.category_id =  c1.category_id 
                                   AND record.application_group = c1.application_group
                                   AND record.status = "open"
-                                  order by updated_at desc, record_id  limit ? offset ?'`
+                                  order by updated_at desc, record_id  limit ? offset ?`
   /*
   for (let i = 0; i < myGroupResult.length; i++) {
     const groupId = myGroupResult[i].group_id;
@@ -293,7 +295,7 @@ const tomeActive = async (req, res) => {
   mylog(recordResult);
   */
 
-  const [recordResult] = await pool.query(searchRecordwithJoinQs, [myGroupResult[0], limit, offcet])
+  const [recordResult] = await pool.query(searchRecordwithJoinQs, [user.user_id, limit, offcet])
   const items = Array(recordResult.length);
   let count = recordResult.length;
 
