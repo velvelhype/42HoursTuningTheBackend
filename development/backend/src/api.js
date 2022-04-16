@@ -394,7 +394,7 @@ const allActive = async (req, res) => {
   }
   const record_startTime = await performance.now();
   const SearchRecordQs = `select * from record where status = "open" order by updated_at desc, record_id asc limit ? offset ?`;
-  const [recordResult] = await pool.query(searchRecordQs, [limit, offset]);
+  const [recordResult] = await pool.query(SearchRecordQs, [limit, offset]);
   /*
   const [embeddedRecordResult] = await pool.query(embeddedSearchRecordQs, [limit, offset]);
   mylog("\n\n[DEBUG]ANS:\n");
