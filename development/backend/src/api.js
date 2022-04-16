@@ -241,14 +241,9 @@ const tomeActive = async (req, res) => {
   const targetCategoryAppGroupList = [];
   const searchTargetQs = `select * from category_group where group_id = ?`;
 
-  const searchRecordwithJoinQs = `SELECT * FROM record 
-                                  JOIN (SELECT * FROM category_group 
-                                    JOIN SELECT * from group_member where user_id = ? 
-                                    ON group_member.group_id = category_group.group_id) AS c1 
-                                  ON record.category_id =  c1.category_id 
-                                  AND record.application_group = c1.application_group
-                                  AND record.status = "open"
-                                  order by updated_at desc, record_id  limit ? offset ?`
+  const searchMyGroupAndTargetQS = `SELECT * FROM category_group
+                                    JOIN (SELECT * FROM group_member where user_id = ?)`
+                                    
   /*
   for (let i = 0; i < myGroupResult.length; i++) {
     const groupId = myGroupResult[i].group_id;
@@ -265,7 +260,15 @@ const tomeActive = async (req, res) => {
       });
     }
   }
- 
+ */
+  const [targetResult] = await pool.query(searchMyGroupAndTargetQS, [user.user_id]);
+  for (let j = 0; j < targetResult.length; j++) {
+    const targetLine = targetResult[j];
+    mylog(targetLine);
+    targetCategoryAppGroupList.push({
+      categoryId: targetLine.category_id,
+      applicationGroup: targetLine.application_group,
+    });
 
   let searchRecordQs =
     'select * from record where status = "open" and (category_id, application_group) in (';
@@ -293,7 +296,7 @@ const tomeActive = async (req, res) => {
 
   const [recordResult] = await pool.query(searchRecordQs, param);
   mylog(recordResult);
-  */
+ 
 
   const [recordResult] = await pool.query(searchRecordwithJoinQs, [user.user_id, limit, offcet])
   const items = Array(recordResult.length);
@@ -377,12 +380,11 @@ const tomeActive = async (req, res) => {
 
     items[i] = resObj;
   }
-  /*
+  
   const [recordCountResult] = await pool.query(recordCountQs, param);
   if (recordCountResult.length === 1) {
     count = recordCountResult[0]['count(*)'];
   }
-  */
   
   res.send({ count: count, items: items });
 };
