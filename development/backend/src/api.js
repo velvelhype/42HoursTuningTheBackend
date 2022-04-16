@@ -396,9 +396,9 @@ const allActive = async (req, res) => {
   const searchRecordQs = `select * from record where status = "open" limit ? offset ?`;
   const record_startTime = await performance.now();
   mylog("\n\n[DEBUG]before sort:\n");
-  const [recordResult] = await pool.query(searchRecordQs, [limit, offset]);
-  mylog(recordResult)
-  recordResult.sort((a, b) => {
+  const [unsortedRecordResult] = await pool.query(searchRecordQs, [limit, offset]);
+  mylog(unsortedRecordResult)
+  const [recordResult] = await unsortedRecordResult.sort((a, b) => {
     if(a.updatedAt > b.updatedAt)
       return 0;
     if(a.updatedAt == b.updatedAt)
