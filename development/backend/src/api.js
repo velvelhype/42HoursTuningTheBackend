@@ -269,7 +269,7 @@ const tomeActive = async (req, res) => {
       categoryId: targetLine.category_id,
       applicationGroup: targetLine.application_group,
     });
-
+  }
   let searchRecordQs =
     'select * from record where status = "open" and (category_id, application_group) in (';
   let recordCountQs =
