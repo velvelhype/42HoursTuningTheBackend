@@ -394,10 +394,11 @@ const allActive = async (req, res) => {
   }
 
   const searchRecordQs = `select * from record where status = "open" order by updated_at desc, record_id asc limit ? offset ?`;
-
+  const record_startTime = performance.now();
   const [recordResult] = await pool.query(searchRecordQs, [limit, offset]);
   mylog(recordResult);
-
+  const record_endTime = performance.now();
+  mylog("\nrecord time: ", record_endTime - record_startTime);
   const items = Array(recordResult.length);
   let count = 0;
 
@@ -434,27 +435,39 @@ const allActive = async (req, res) => {
     let thumbNailItemId = null;
     let commentCount = 0;
     let isUnConfirmed = true;
-
+    const user_startTime = performance.now();
     const [userResult] = await pool.query(searchUserQs, [createdBy]);
     if (userResult.length === 1) {
       createdByName = userResult[0].name;
     }
+    const user_endTime = performance.now();
+    mylog("\nuser time: ", user_endTime - user_startTime);
 
+    const group_startTime = performance.now();
     const [groupResult] = await pool.query(searchGroupQs, [applicationGroup]);
     if (groupResult.length === 1) {
       applicationGroupName = groupResult[0].name;
     }
+    const group_endTime = performance.now();
+    mylog("\ngroup time: ", group_endTime - group_startTime);
 
+    const item_startTime = performance.now();
     const [itemResult] = await pool.query(searchThumbQs, [recordId]);
     if (itemResult.length === 1) {
       thumbNailItemId = itemResult[0].item_id;
     }
+    const item_endTime = performance.now();
+    mylog("\titem time: ", item_endTime - item_startTime);
 
+    const count_startTime = performance.now();
     const [countResult] = await pool.query(countQs, [recordId]);
     if (countResult.length === 1) {
       commentCount = countResult[0]['count(*)'];
     }
+    const count_endTime = performance.now();
+    mylog("\tcount time: ", count_endTime - count_startTime);
 
+    const last_startTime = performance.now();
     const [lastResult] = await pool.query(searchLastQs, [user.user_id, recordId]);
     if (lastResult.length === 1) {
       mylog(updatedAt);
@@ -464,6 +477,8 @@ const allActive = async (req, res) => {
         isUnConfirmed = false;
       }
     }
+    const last_endTime = performance.now();
+    mylog("\tcount time: ", last_endTime - last_startTime);
 
     resObj.recordId = recordId;
     resObj.title = line.title;
@@ -482,11 +497,13 @@ const allActive = async (req, res) => {
 
   const recordCountQs = 'select count(*) from record where status = "open"';
 
+  const recordcount_startTime = performance.now();
   const [recordCountResult] = await pool.query(recordCountQs);
   if (recordCountResult.length === 1) {
     count = recordCountResult[0]['count(*)'];
   }
-
+  const recordcount_endTime = performance.now();
+  mylog("\trecordcount time: ", recordcount_endTime - recordcount_startTime);
   res.send({ count: count, items: items });
 };
 
