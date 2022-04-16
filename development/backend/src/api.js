@@ -478,7 +478,7 @@ const allActive = async (req, res) => {
       }
     }
     const last_endTime = await performance.now();
-    mylog(`\ncount time:${last_endTime - last_startTime}`);
+    mylog(`\nlast time:${last_endTime - last_startTime}`);
 
     resObj.recordId = recordId;
     resObj.title = line.title;
