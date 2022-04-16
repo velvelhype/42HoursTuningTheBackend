@@ -235,12 +235,8 @@ const tomeActive = async (req, res) => {
     limit = 10;
   }
 
-<<<<<<< HEAD
   const searchMyGroupQs = `select * from group_member where user_id = ?`;
   
-=======
-  const searchMyGroupQs = `select group_id from group_member where user_id = ?`;
->>>>>>> abda28a3f0570526397a542c4f265a45895546c9
   const [myGroupResult] = await pool.query(searchMyGroupQs, [user.user_id]);
   mylog(myGroupResult);
  
