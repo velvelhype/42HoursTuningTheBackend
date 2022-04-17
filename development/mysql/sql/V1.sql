@@ -1,6 +1,13 @@
 ALTER TABLE record ADD INDEX (status);
 ALTER TABLE record_comment ADD INDEX (linked_record_id);
 ALTER TABLE record_item_file ADD INDEX (linked_record_id, item_id);
+ALTER TABLE record_item file ADD INDEX (linked_record_id);
+ALTER TABLE record ADD INDEX (status, updated_at, record_id);
+ALTER TABLE record ADD INDEX (status);
+ALTER TABLE record ADD INDEX (status, updated_at);
+ALTER TABLE record ADD INDEX (updated_at);
+ALTER TABLE record ADD INDEX (record_id);
+ALTER TABLE record ADD INDEX (updated_at, record_id);
 
 
 CREATE TABLE `user` (
