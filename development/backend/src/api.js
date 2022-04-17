@@ -1,11 +1,11 @@
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-
+const performance = require('perf_hooks').performance;
 const jimp = require('jimp');
 
 const mysql = require('mysql2/promise');
 
-
+const DEBUG = 0;
 // MEMO: 設定項目はここを参考にした
 // https://github.com/sidorares/node-mysql2#api-and-configuration
 // https://github.com/mysqljs/mysql
@@ -31,7 +31,7 @@ const mylog = (obj) => {
 
 const getLinkedUser = async (headers) => {
   const target = headers['x-app-key'];
-  mylog(target);
+  if(DEBUG)mylog(target);
   const qs = `select linked_user_id from session where value = ? limit 1`;
   // const qs = `select * from session where value = ?`
 
@@ -57,10 +57,10 @@ const postRecords = async (req, res) => {
     return;
   }
 
-  mylog(user);
+  if(DEBUG)mylog(user);
 
   const body = req.body;
-  mylog(body);
+  if(DEBUG)mylog(body);
 
   let [rows] = await pool.query(
     `select * from group_member where user_id = ?
@@ -76,7 +76,7 @@ const postRecords = async (req, res) => {
 
   const userPrimary = rows[0];
 
-  mylog(userPrimary);
+  if(DEBUG)mylog(userPrimary);
 
   const newId = uuidv4();
 
@@ -121,7 +121,7 @@ const getRecord = async (req, res) => {
   const recordQs = `select * from record where record_id = ?`;
 
   const [recordResult] = await pool.query(recordQs, [`${recordId}`]);
-  mylog(recordResult);
+  if(DEBUG)mylog(recordResult);
 
   if (recordResult.length !== 1) {
     res.status(404).send({});
@@ -187,8 +187,8 @@ const getRecord = async (req, res) => {
 
   const searchItemQs = `select * from record_item_file where linked_record_id = ? order by item_id asc`;
   const [itemResult] = await pool.query(searchItemQs, [line.record_id]);
-  mylog('itemResult');
-  mylog(itemResult);
+  if(DEBUG)('itemResult');
+  if(DEBUG)mylog(itemResult);
 
   const searchFileQs = `select name from file where file_id = ? limit 1`;
   for (let i = 0; i < itemResult.length; i++) {
@@ -237,19 +237,19 @@ const tomeActive = async (req, res) => {
 
   const searchMyGroupQs = `select group_id from group_member where user_id = ?`;
   const [myGroupResult] = await pool.query(searchMyGroupQs, [user.user_id]);
-  mylog(myGroupResult);
+  if(DEBUG)(myGroupResult);
 
   const targetCategoryAppGroupList = [];
   const searchTargetQs = `select category_id, application_group from category_group where group_id = ?`;
 
   for (let i = 0; i < myGroupResult.length; i++) {
     const groupId = myGroupResult[i].group_id;
-    mylog(groupId);
+    if(DEBUG)mylog(groupId);
 
     const [targetResult] = await pool.query(searchTargetQs, [groupId]);
     for (let j = 0; j < targetResult.length; j++) {
       const targetLine = targetResult[j];
-      mylog(targetLine);
+      if(DEBUG)mylog(targetLine);
 
       targetCategoryAppGroupList.push({
         categoryId: targetLine.category_id,
@@ -279,11 +279,11 @@ const tomeActive = async (req, res) => {
   recordCountQs += ' )';
   param.push(limit);
   param.push(offset);
-  mylog(searchRecordQs);
-  mylog(param);
+  if(DEBUG)mylog(searchRecordQs);
+  if(DEBUG)mylog(param);
 
   const [recordResult] = await pool.query(searchRecordQs, param);
-  mylog(recordResult);
+  if(DEBUG)mylog(recordResult);
 
   const items = Array(recordResult.length);
   let count = 0;
@@ -311,7 +311,7 @@ const tomeActive = async (req, res) => {
     };
 
     const line = recordResult[i];
-    mylog(line);
+    if(DEBUG)mylog(line);
     const recordId = recordResult[i].record_id;
     const createdBy = line.created_by;
     const applicationGroup = line.application_group;
@@ -344,7 +344,7 @@ const tomeActive = async (req, res) => {
 
     const [lastResult] = await pool.query(searchLastQs, [user.user_id, recordId]);
     if (lastResult.length === 1) {
-      mylog(updatedAt);
+      if(DEBUG)mylog(updatedAt);
       const updatedAtNum = Date.parse(updatedAt);
       const accessTimeNum = Date.parse(lastResult[0].access_time);
       if (updatedAtNum <= accessTimeNum) {
@@ -392,12 +392,40 @@ const allActive = async (req, res) => {
     offset = 0;
     limit = 10;
   }
-
-  const searchRecordQs = `select * from record where status = "open" order by updated_at desc, record_id asc limit ? offset ?`;
-
-  const [recordResult] = await pool.query(searchRecordQs, [limit, offset]);
-  mylog(recordResult);
-
+  const record_startTime = await performance.now();
+  const SearchRecordQs = `select * from record where status = "open" order by updated_at desc, record_id asc limit ? offset ?`;
+  const [recordResult] = await pool.query(SearchRecordQs, [limit, offset]);
+  /*
+  const [embeddedRecordResult] = await pool.query(embeddedSearchRecordQs, [limit, offset]);
+  mylog("\n\n[DEBUG]ANS:\n");
+  mylog(embeddedRecordResult);
+  const searchRecordQs = `select * from record where status = "open" limit ? offset ?`;
+  mylog("\n\n[DEBUG]before sort:\n");
+  const [unsortedRecordResult] = await pool.query(searchRecordQs, [limit, offset]);
+  mylog(unsortedRecordResult)
+  const recordResult = await unsortedRecordResult.sort((a, b) => {
+    var updatedAt_a = new Date(a.updated_at);
+    var updatedAt_b = new Date(b.updated_at);
+    mylog(`a.updatedAt:${a.updated_at}, b.updatedAt:${b.updated_at} , compare：${updatedAt_a < updatedAt_b}`);
+    if(updatedAt_a > updatedAt_b)
+    {
+      mylog("return -1\n");
+      return -1;
+    }
+    if(updatedAt_a == updatedAt_b)
+    {
+      mylog("return 0\n");
+      return a.record_id > b.record_id;
+    }
+    mylog("return 1\n");
+    return 1;
+  });
+  mylog("\n\n[DEBUG]after sort:\n");
+  mylog(recordResult)
+  if(DEBUG)(recordResult);
+  */
+  const record_endTime = await performance.now();
+  mylog(`\nrecord time: ${record_endTime - record_startTime}`);
   const items = Array(recordResult.length);
   let count = 0;
 
@@ -424,7 +452,7 @@ const allActive = async (req, res) => {
     };
 
     const line = recordResult[i];
-    mylog(line);
+    if(DEBUG)mylog(line);
     const recordId = recordResult[i].record_id;
     const createdBy = line.created_by;
     const applicationGroup = line.application_group;
@@ -434,27 +462,39 @@ const allActive = async (req, res) => {
     let thumbNailItemId = null;
     let commentCount = 0;
     let isUnConfirmed = true;
-
+    const user_startTime = await performance.now();
     const [userResult] = await pool.query(searchUserQs, [createdBy]);
     if (userResult.length === 1) {
       createdByName = userResult[0].name;
     }
+    const user_endTime = await performance.now();
+    mylog(`\nuser time: ${user_endTime - user_startTime}`);
 
+    const group_startTime = await performance.now();
     const [groupResult] = await pool.query(searchGroupQs, [applicationGroup]);
     if (groupResult.length === 1) {
       applicationGroupName = groupResult[0].name;
     }
+    const group_endTime = await performance.now();
+    mylog(`\ngroup time:${group_endTime - group_startTime}`);
 
+    const item_startTime = await performance.now();
     const [itemResult] = await pool.query(searchThumbQs, [recordId]);
     if (itemResult.length === 1) {
       thumbNailItemId = itemResult[0].item_id;
     }
+    const item_endTime = await performance.now();
+    mylog(`\nitem time: ${item_endTime - item_startTime}`);
 
+    const count_startTime = await performance.now();
     const [countResult] = await pool.query(countQs, [recordId]);
     if (countResult.length === 1) {
       commentCount = countResult[0]['count(*)'];
     }
+    const count_endTime = await performance.now();
+    mylog(`\ncount time: ${count_endTime - count_startTime}`);
 
+    const last_startTime = await performance.now();
     const [lastResult] = await pool.query(searchLastQs, [user.user_id, recordId]);
     if (lastResult.length === 1) {
       mylog(updatedAt);
@@ -464,6 +504,8 @@ const allActive = async (req, res) => {
         isUnConfirmed = false;
       }
     }
+    const last_endTime = await performance.now();
+    mylog(`\nlast time:${last_endTime - last_startTime}`);
 
     resObj.recordId = recordId;
     resObj.title = line.title;
@@ -482,11 +524,13 @@ const allActive = async (req, res) => {
 
   const recordCountQs = 'select count(*) from record where status = "open"';
 
+  const recordcount_startTime = await performance.now();
   const [recordCountResult] = await pool.query(recordCountQs);
   if (recordCountResult.length === 1) {
     count = recordCountResult[0]['count(*)'];
   }
-
+  const recordcount_endTime = await performance.now();
+  mylog(`\nrecordcount time:${recordcount_endTime - recordcount_startTime}`);
   res.send({ count: count, items: items });
 };
 
@@ -511,7 +555,7 @@ const allClosed = async (req, res) => {
   const searchRecordQs = `select * from record where status = "closed" order by updated_at desc, record_id asc limit ? offset ?`;
 
   const [recordResult] = await pool.query(searchRecordQs, [limit, offset]);
-  mylog(recordResult);
+  if(DEBUG)mylog(recordResult);
 
   const items = Array(recordResult.length);
   let count = 0;
@@ -539,7 +583,7 @@ const allClosed = async (req, res) => {
     };
 
     const line = recordResult[i];
-    mylog(line);
+    if(DEBUG)mylog(line);
     const recordId = recordResult[i].record_id;
     const createdBy = line.created_by;
     const applicationGroup = line.application_group;
@@ -572,7 +616,7 @@ const allClosed = async (req, res) => {
 
     const [lastResult] = await pool.query(searchLastQs, [user.user_id, recordId]);
     if (lastResult.length === 1) {
-      mylog(updatedAt);
+      if(DEBUG)mylog(updatedAt);
       const updatedAtNum = Date.parse(updatedAt);
       const accessTimeNum = Date.parse(lastResult[0].access_time);
       if (updatedAtNum <= accessTimeNum) {
@@ -626,7 +670,7 @@ const mineActive = async (req, res) => {
   const searchRecordQs = `select * from record where created_by = ? and status = "open" order by updated_at desc, record_id asc limit ? offset ?`;
 
   const [recordResult] = await pool.query(searchRecordQs, [user.user_id, limit, offset]);
-  mylog(recordResult);
+  if(DEBUG)mylog(recordResult);
 
   const items = Array(recordResult.length);
   let count = 0;
@@ -654,7 +698,7 @@ const mineActive = async (req, res) => {
     };
 
     const line = recordResult[i];
-    mylog(line);
+    if(DEBUG)mylog(line);
     const recordId = recordResult[i].record_id;
     const createdBy = line.created_by;
     const applicationGroup = line.application_group;
@@ -687,7 +731,7 @@ const mineActive = async (req, res) => {
 
     const [lastResult] = await pool.query(searchLastQs, [user.user_id, recordId]);
     if (lastResult.length === 1) {
-      mylog(updatedAt);
+      if(DEBUG)mylog(updatedAt);
       const updatedAtNum = Date.parse(updatedAt);
       const accessTimeNum = Date.parse(lastResult[0].access_time);
       if (updatedAtNum <= accessTimeNum) {
@@ -756,7 +800,7 @@ const getComments = async (req, res) => {
   const commentQs = `select * from record_comment where linked_record_id = ? order by created_at desc`;
 
   const [commentResult] = await pool.query(commentQs, [`${recordId}`]);
-  mylog(commentResult);
+  if(DEBUG)mylog(commentResult);
 
   const commentList = Array(commentResult.length);
 
@@ -798,7 +842,7 @@ const getComments = async (req, res) => {
   }
 
   for (const row of commentList) {
-    mylog(row);
+    if(DEBUG)mylog(row);
   }
 
   res.send({ items: commentList });
@@ -847,7 +891,7 @@ const getCategories = async (req, res) => {
   const [rows] = await pool.query(`select * from category`);
 
   for (const row of rows) {
-    mylog(row);
+    if(DEBUG)mylog(row);
   }
 
   const items = {};
@@ -870,7 +914,7 @@ const postFiles = async (req, res) => {
   }
 
   const base64Data = req.body.data;
-  mylog(base64Data);
+  if(DEBUG)mylog(base64Data);
 
   const name = req.body.name;
 
@@ -882,8 +926,8 @@ const postFiles = async (req, res) => {
   fs.writeFileSync(`${filePath}${newId}_${name}`, binary);
 
   const image = await jimp.read(fs.readFileSync(`${filePath}${newId}_${name}`));
-  mylog(image.bitmap.width);
-  mylog(image.bitmap.height);
+  if(DEBUG)mylog(image.bitmap.width);
+  if(DEBUG)mylog(image.bitmap.height);
 
   const size = image.bitmap.width < image.bitmap.height ? image.bitmap.width : image.bitmap.height;
   await image.cover(size, size);
@@ -915,9 +959,9 @@ const getRecordItemFile = async (req, res) => {
   }
 
   const recordId = req.params.recordId;
-  mylog(recordId);
+  if(DEBUG)mylog(recordId);
   const itemId = Number(req.params.itemId);
-  mylog(itemId);
+  if(DEBUG)mylog(itemId);
 
   const [rows] = await pool.query(
     `select f.name, f.path from record_item_file r
@@ -935,13 +979,13 @@ const getRecordItemFile = async (req, res) => {
     res.status(404).send({});
     return;
   }
-  mylog(rows[0]);
+  if(DEBUG)mylog(rows[0]);
 
   const fileInfo = rows[0];
 
   const data = fs.readFileSync(fileInfo.path);
   const base64 = data.toString('base64');
-  mylog(base64);
+  if(DEBUG)mylog(base64);
 
   res.send({ data: base64, name: fileInfo.name });
 };
@@ -957,9 +1001,9 @@ const getRecordItemFileThumbnail = async (req, res) => {
   }
 
   const recordId = req.params.recordId;
-  mylog(recordId);
+  if(DEBUG)mylog(recordId);
   const itemId = Number(req.params.itemId);
-  mylog(itemId);
+  if(DEBUG)mylog(itemId);
 
   const [rows] = await pool.query(
     `select f.name, f.path from record_item_file r
@@ -977,13 +1021,13 @@ const getRecordItemFileThumbnail = async (req, res) => {
     res.status(404).send({});
     return;
   }
-  mylog(rows[0]);
+  if(DEBUG)mylog(rows[0]);
 
   const fileInfo = rows[0];
 
   const data = fs.readFileSync(fileInfo.path);
   const base64 = data.toString('base64');
-  mylog(base64);
+  if(DEBUG)mylog(base64);
 
   res.send({ data: base64, name: fileInfo.name });
 };

@@ -1,3 +1,16 @@
+ALTER TABLE record ADD INDEX (status);
+ALTER TABLE record_comment ADD INDEX (linked_record_id);
+ALTER TABLE record_item_file ADD INDEX (linked_record_id, item_id);
+ALTER TABLE record_item file ADD INDEX (linked_record_id);
+ALTER TABLE record ADD INDEX (status, updated_at, record_id);
+ALTER TABLE record ADD INDEX (status);
+ALTER TABLE record ADD INDEX (status, updated_at);
+ALTER TABLE record ADD INDEX (updated_at);
+ALTER TABLE record ADD INDEX (record_id);
+ALTER TABLE record ADD INDEX (updated_at, record_id);
+ALTER TABLE record ADD INDEX (created_by, status);
+
+
 CREATE TABLE `user` (
     `user_id` bigint NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(32) NOT NULL,
@@ -78,11 +91,10 @@ CREATE TABLE `session` (
     PRIMARY KEY (`session_id`)
 );
 
-ALTER TABLE session ADD INDEX session_index(value);
-
 CREATE TABLE `file` (
     `file_id` VARCHAR(64) NOT NULL,
     `path` VARCHAR(1024) NOT NULL,
     `name` VARCHAR(256) NOT NULL,
     PRIMARY KEY (`file_id`)
 );
+
