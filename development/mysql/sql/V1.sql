@@ -8,6 +8,7 @@ ALTER TABLE record ADD INDEX (status, updated_at);
 ALTER TABLE record ADD INDEX (updated_at);
 ALTER TABLE record ADD INDEX (record_id);
 ALTER TABLE record ADD INDEX (updated_at, record_id);
+ALTER TABLE record ADD INDEX (created_by, status);
 
 
 CREATE TABLE `user` (
