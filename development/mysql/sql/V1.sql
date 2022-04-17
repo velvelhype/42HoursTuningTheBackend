@@ -1,3 +1,8 @@
+ALTER TABLE record ADD INDEX (status);
+ALTER TABLE record_comment ADD INDEX (linked_record_id);
+ALTER TABLE record_item_file ADD INDEX (linked_record_id, item_id);
+
+
 CREATE TABLE `user` (
     `user_id` bigint NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(32) NOT NULL,
@@ -85,5 +90,3 @@ CREATE TABLE `file` (
     PRIMARY KEY (`file_id`)
 );
 
-CREATE INDEX value_userid ON session(value, linked_user_id);
-CREATE INDEX status_index ON record(status, record_id);
